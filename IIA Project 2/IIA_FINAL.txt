@@ -1,0 +1,89 @@
+
+%########################################################################################
+%
+%
+%lucrarea ese realizata pe WINDOWS 10 (extensia "txt")
+%
+%In proiect voi simula  intersectie semaforizata(Intersectia de la Baritiu)
+%intersectia e formata din 5 strazi dintre care 2 sunt cu sens unic
+%m1, m2, m3, m4, m5 sunt masinile ce stationeaza pe strada 1, 2, 3, 4 respectiv 5%
+%p1, p2, p3, p4 sun pietonii ce asteapta la cele 4 treceri
+%************************************************************
+%***Pozitionarea in intersectie si numerotarea directiilor***
+%****se gasesc in arhiva postata, in cadrul pozelor.*********
+%************************************************************
+%miscarile posibile ale pietonilor: stationare si trecere.
+%miscarile posibile ale masinilor: stationare(Stop), inainte (N), V, E, NE etc.
+%
+%Am numit directiile directiile de mers din pct de vedere al fiecarei strazi(detalii in poze)
+% din m3 se poate merge in m2 si cu pietonii mergand (nu ii incomodeaza)
+%#######################################################################################
+
+
+% gesionare miscari masini
+%
+m1Stop | m1N | m1SE  |m1V |m1NE.
+m2Stop. % | m2N | m2E | m2V. Am gandit sensul unic ca pe un sens normal in care pe sensul opus mereu stationeaza
+m3Stop | m3NV | m3NE | m3E | m3V.
+m4Stop | m4N | m4E | m4NV | m4SV.
+m5Stop | m5NE | m5E | m5V | m5NV.
+
+% gesionare miscari pietoni
+%
+p1stationeaza | p1trece.
+p2stationeaza | p2trece.
+p3stationeaza | p3trece.
+p4stationeaza | p4trece.
+
+% gestionare miscari masini -> restrictii
+%
+m1Stop -> (-m1N & -m1V & -m1SE & -m1NE).
+m1N -> (-m1Stop & -m1V & -m1SE & -m1NE ).
+m1SE -> (-m1Stop & -m1N & -m1V).
+m1V -> (-m1Stop & -m1SE & -m1NE & -m1N).
+m3Stop -> (-m3NV & -m3NE & -m3E & -m3V).
+m3NV -> (-m3Stop & -m3V & -m3E & -m3NE).
+m3NE -> (-m3Stop & -m3V & -m3E & -m3NV).
+%m3V -> (-m3Stop & -m3E & -m3NV & -m3NE).
+m3E -> (-m3Stop & -m3V & -m3NV & -m3NE).
+m4Stop -> (-m4N & -m4E & -m4NV & -m4SV).
+m4N -> (-m4Stop & -m4E & -m4NV & -m4SV).
+m4NV -> (-m4Stop & -m4E & -m4N & -m4SV).
+m4E -> (-m4Stop & -m4NV & -m4N & -m4SV).
+m5Stop -> (-m5E & -m5NE & -m5NV & -m5V).
+m5E -> (-m5Stop & -m5NE & -m5NV & -m5V).
+m5NE -> (-m5Stop & -m5E & -m5NV & -m5V).
+m5V -> (-m5Stop & -m5NE & -m5NV & -m5E).
+
+% gestionare miscari  pietoni -> restrictii
+%
+p1stationeaza  -> -p1trece.
+p1trece -> -p1stationeaza .
+p2stationeaza -> -p2trece.
+p2trece -> -p2stationeaza .
+p3stationeaza  -> -p3trece.
+p3trece -> -p3stationeaza .
+p4stationeaza -> -p4trece.
+p4trece -> -p4stationeaza .
+
+%reguli circulatie pietoni -> implicatii
+%
+p1trece -> (m1Stop & -m3NV & -m4N & -m5E).
+p2trece -> (m2Stop & m3V  & -m1SE & -m1NE  & -m4NV & -m4SV & -m5NE & -m5NV).
+p3trece -> (m4Stop & -m1N & -m3E & -m5V ).
+p4trece -> (m5Stop & -m1V & -m3NE & -m4E).
+
+%reguli circulatie masini
+%
+m1N ->(p1stationeaza & p3stationeaza & m3Stop & -m4NV & -m5V & -m4SV).
+m1SE ->(p1stationeaza & p2stationeaza & -m4N & -m4NV & -m4SV & -m3NV & -m3V).
+m1V ->(p1stationeaza & p4stationeaza & -m3NE & -m3NV& -m4N  & -m5E & -m5NE & -m5NV & -m5V). % & -m3E
+m3NE ->(p2stationeaza & p4stationeaza & m4Stop & -m5V & -m1N & -m1V ).
+m3NV ->(p1stationeaza & p2stationeaza  & -m5E & -m4N & m4NV).
+m3E ->(p3stationeaza & p2stationeaza & -m3NE & -m3NV  & -m1N  & -m4NV & -m5NE & -m5V).% & -m1V & -m4N & -m5NE & -m5E
+%m3V -> (p2stationeaza & -m3NE & -m3NV) 
+m4N ->(p3stationeaza & p1stationeaza & m5Stop & -m3NE & -m3NV & -m1V).
+m4E ->(p3stationeaza & p4stationeaza & -m1V & -m3NE).
+m4NV ->(p3stationeaza & p2stationeaza & -m3NE & -m3NV & -m1SE & -m1N & -m5NE & -m5V & m3E).
+
+
